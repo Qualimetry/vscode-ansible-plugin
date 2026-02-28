@@ -1,0 +1,114 @@
+{
+  "name": "qualimetry-vscode-ansible-plugin",
+  "displayName": "Qualimetry Ansible Analyzer",
+  "description": "Real-time static analysis for Ansible playbooks and task files (.yml, .yaml) powered by the Qualimetry analysis engine.",
+  "version": "3.2.6",
+  "publisher": "Qualimetry",
+  "license": "Apache-2.0",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Qualimetry/vscode-ansible-plugin.git"
+  },
+  "homepage": "https://github.com/Qualimetry/vscode-ansible-plugin#readme",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:yaml",
+    "onLanguage:ansible",
+    "onStartupFinished",
+    "onCommand:ansible.importRulesFromSonarQube"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "ansible.importRulesFromSonarQube",
+        "title": "Ansible: Import rules from SonarQube"
+      }
+    ],
+    "languages": [
+      {
+        "id": "ansible",
+        "aliases": [
+          "Ansible",
+          "Ansible Playbook"
+        ],
+        "extensions": [
+          ".yml",
+          ".yaml"
+        ],
+        "filenamePatterns": [
+          "**/playbook*.yml",
+          "**/tasks/*.yml",
+          "**/handlers/*.yml"
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "Ansible Analyzer",
+      "properties": {
+        "ansibleAnalyzer.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable the Ansible Analyzer."
+        },
+        "ansibleAnalyzer.java.home": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a Java 17+ installation. If empty, uses JAVA_HOME or PATH."
+        },
+        "ansibleAnalyzer.rulesReplaceDefaults": {
+          "type": "boolean",
+          "default": false,
+          "description": "When true, only the rules listed in ansibleAnalyzer.rules run (e.g. after Import from SonarQube). When false, listed rules are overrides and unlisted rules use the extension default profile."
+        },
+        "ansibleAnalyzer.rules": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "blocker",
+                  "critical",
+                  "major",
+                  "minor",
+                  "info"
+                ]
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "Per-rule overrides. Omit or use {} to use the extension default. Add only the rule IDs you want to change (enabled, severity, or rule-specific properties). Unlisted rules use the built-in default unless rulesReplaceDefaults is true."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "bundle": "esbuild src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --minify",
+    "vscode:prepublish": "npm run bundle"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.27.3",
+    "typescript": "^5.3.0"
+  }
+}
